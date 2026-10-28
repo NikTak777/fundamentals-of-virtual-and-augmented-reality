@@ -84,7 +84,7 @@ def make_overview(original, channels):
     return canvas
 
 
-def show_results(original, channels, output_dir):
+def show_results(original, channels):
     """Показывает исходник и три изображения каналов в одном окне."""
     root = tk.Tk()
     root.title('Результат преобразования RGB на каналы YIQ')
@@ -119,9 +119,13 @@ def show_results(original, channels, output_dir):
 
         canvas.bind('<Configure>', on_resize)
 
-    items = [('Исходное RGB', original), ('Y - яркость: (Y, 0, 0)', channels['Y']),
-             ('I - цветовая составляющая: (0, I, 0)', channels['I']),
-             ('Q - цветовая составляющая: (0, 0, Q)', channels['Q'])]
+    items = [
+        ('Исходное RGB', original),
+        ('Y - яркость: (Y, 0, 0)', channels['Y']),
+        ('I - цветовая составляющая: (0, I, 0)', channels['I']),
+        ('Q - цветовая составляющая: (0, 0, Q)', channels['Q'])
+    ]
+
     for index, (title, image) in enumerate(items):
         frame = ttk.LabelFrame(root, text=title, padding=8)
         frame.grid(row=index // 2, column=index % 2, padx=6, pady=6, sticky='nsew')
