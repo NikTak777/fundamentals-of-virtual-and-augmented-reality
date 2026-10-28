@@ -40,24 +40,47 @@ def read_image(path) -> Image.Image:
 
 def make_overview(original, channels):
     """Создаёт общую иллюстрацию с исходником и тремя каналами."""
-    cw, ch, label_h = 560, 400, 46
-    canvas = Image.new('RGB', (cw * 2, (ch + label_h) * 2), 'white')
-    draw = ImageDraw.Draw(canvas)
+    width, height, label_height = 960, 494, 46
+    canvas = Image.new(
+        mode='RGB',
+        size=(width * 2, (height + label_height) * 2),
+        color='white'
+    )
+    draw = ImageDraw.Draw(im=canvas)
     try:
-        font = ImageFont.truetype('arial.ttf', 22)
+        font = ImageFont.truetype(
+            font='arial.ttf',
+            size=22
+        )
     except OSError:
         font = ImageFont.load_default(size=20)
-    items = [('Original RGB', original), ('Y (Y, 0, 0)', channels['Y']),
-             ('I (0, I, 0)', channels['I']),
-             ('Q (0, 0, Q)', channels['Q'])]
-    for index, (label, image) in enumerate(items):
 
-        left, top = (index % 2) * cw, (index // 2) * (ch + label_h)
-        draw.text((left + 16, top + 10), label, fill='black', font=font)
+    items = [
+        ('Original RGB', original),
+        ('Y (Y, 0, 0)', channels['Y']),
+        ('I (0, I, 0)', channels['I']),
+        ('Q (0, 0, Q)', channels['Q'])
+    ]
+
+    for index, (label, image) in enumerate(items):
+        left = (index % 2) * width
+        top = (index // 2) * (height + label_height)
+        draw.text(
+            xy=(left + 16, top + 10),
+            text=label,
+            fill='black',
+            font=font
+        )
         preview = image.copy()
-        preview.thumbnail((cw - 20, ch - 20), Image.Resampling.LANCZOS)
-        canvas.paste(preview, (left + (cw - preview.width) // 2,
-                              top + label_h + (ch - preview.height) // 2))
+        preview.thumbnail(
+            size=(width - 20, height - 20),
+            resample=Image.Resampling.LANCZOS
+        )
+        canvas.paste(
+            im=preview,
+            box=(left + (width - preview.width) // 2,
+                top + label_height + (height - preview.height) // 2)
+        )
     return canvas
 
 
