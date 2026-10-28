@@ -143,14 +143,19 @@ def show_results(original, channels, output_dir):
 def select_image():
     """Возвращает строку с путём к изображению или пустую строку при отмене."""
     root = tk.Tk()
-    root.withdraw()  # Скрываем пустое окно, оставляя диалог выбора файла.
+    root.withdraw()
     try:
-        return filedialog.askopenfilename(parent=root, title='Выберите исходное изображение',
-            filetypes=[('Поддерживаемые изображения', '*.bmp *.png *.jpg *.jpeg'),
-                       ('BMP-изображения', '*.bmp'),
-                       ('PNG-изображения', '*.png'),
-                       ('JPEG-изображения', '*.jpg *.jpeg'),
-                       ('Все файлы', '*.*')])
+        return filedialog.askopenfilename(
+            parent=root,
+            title='Выберите исходное изображение',
+            filetypes=[
+                ('Поддерживаемые изображения', '*.bmp *.png *.jpg *.jpeg'),
+                ('BMP-изображения', '*.bmp'),
+                ('PNG-изображения', '*.png'),
+                ('JPEG-изображения', '*.jpg *.jpeg'),
+                ('Все файлы', '*.*')
+            ]
+        )
     finally:
         root.destroy()
 
