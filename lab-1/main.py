@@ -186,7 +186,7 @@ def main() -> None:
         print(f'Ошибка обработки изображения: {error}')
         return
 
-    show_results(original, channels, output_dir)
+    show_results(original, channels)
 
 
 if __name__ == '__main__':
