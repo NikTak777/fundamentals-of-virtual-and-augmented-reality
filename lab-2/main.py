@@ -10,34 +10,21 @@ from tkinter import filedialog, messagebox, ttk
 from tkinter.scrolledtext import ScrolledText
 
 
-def read_matrix(path):
-    """Чтение квадратной целочисленной матрицы из TXT, CSV или JSON."""
+def read_matrix(path: str) -> list[list[int]]:
+    """Читает квадратную матрицу целых чисел из TXT или CSV."""
     text = Path(path).read_text(encoding="utf-8-sig").strip()
+    if not text:
+        raise ValueError("Файл не содержит матрицу.")
 
-    if text.startswith("["):
-        matrix = json.loads(text)
-    else:
-        matrix = [
-            [int(x) for x in re.split(r"[\s;,]+", line.strip())]
-            for line in text.splitlines()
-            if line.strip()
-        ]
-
-    if not isinstance(matrix, list) or not matrix:
-        raise ValueError("Матрица должна быть непустым списком строк.")
+    matrix = [
+        [int(x) for x in re.split(r"[\s;,]+", line.strip())]
+        for line in text.splitlines()
+        if line.strip()
+    ]
 
     n = len(matrix)
-
-    if any(
-        not isinstance(row, list) or len(row) != n
-        for row in matrix
-    ):
-        raise ValueError(
-            "Нужна квадратная матрица: N строк по N чисел."
-        )
-
-    if any(type(x) is not int for row in matrix for x in row):
-        raise ValueError("Элементы должны быть целыми числами.")
+    if any(len(row) != n for row in matrix):
+        raise ValueError("Нужна квадратная матрица: N строк по N чисел.")
 
     return matrix
 
