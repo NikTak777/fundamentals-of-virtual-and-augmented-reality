@@ -29,37 +29,29 @@ def read_matrix(path: str) -> list[list[int]]:
     return matrix
 
 
-def recursive_order(n):
-    """
-    Рекурсивный обход с M=N=2.
+def recursive_order(size: int) -> list[tuple[int, int]]:
+    """Возвращает координаты ячеек в порядке рекурсивного обхода M=N=2."""
 
-    Порядок частей:
-    1. Верхняя левая.
-    2. Верхняя правая.
-    3. Нижняя левая.
-    4. Нижняя правая.
+    def visit_block(row_start: int, row_end: int, col_start: int, col_end: int):
+        height = row_end - row_start
+        width = col_end - col_start
 
-    Возвращает координаты ячеек в порядке обхода.
-    """
-
-    def visit(r0, r1, c0, c1):
-        if r0 >= r1 or c0 >= c1:
+        if height <= 0 or width <= 0:
             return
 
-        if r1 - r0 == 1 and c1 - c0 == 1:
-            yield r0, c0
+        if height == 1 and width == 1:
+            yield row_start, col_start
             return
 
-        # При нечётном размере верхняя/левая часть больше.
-        rm = (r0 + r1 + 1) // 2
-        cm = (c0 + c1 + 1) // 2
+        row_mid = row_start + (height + 1) // 2
+        col_mid = col_start + (width + 1) // 2
 
-        yield from visit(r0, rm, c0, cm)
-        yield from visit(r0, rm, cm, c1)
-        yield from visit(rm, r1, c0, cm)
-        yield from visit(rm, r1, cm, c1)
+        yield from visit_block(row_start, row_mid, col_start, col_mid)  # Верхний левый
+        yield from visit_block(row_start, row_mid, col_mid, col_end)    # Верхний правый
+        yield from visit_block(row_mid, row_end, col_start, col_mid)    # Нижний левый
+        yield from visit_block(row_mid, row_end, col_mid, col_end)      # Нижний правый
 
-    return list(visit(0, n, 0, n))
+    return list(visit_block(0, size, 0, size))
 
 
 def rle_encode(data):
@@ -288,7 +280,7 @@ class App(tk.Tk):
         ).pack(side="left", padx=10)
 
         self.status = tk.StringVar(
-            value="Откройте TXT, CSV или JSON с квадратной матрицей."
+            value="Откройте TXT или CSV с квадратной матрицей."
         )
 
         ttk.Label(
