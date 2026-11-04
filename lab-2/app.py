@@ -31,7 +31,24 @@ class App(tk.Tk):
         for name in ("Исходная матрица", "Обход", "RLE", "Хаффман", "Размеры"):
             frame = ttk.Frame(notebook)
             notebook.add(frame, text=name)
-            view = ScrolledText(frame, wrap="word", font=("Consolas", 11))
+
+            is_matrix_tab = name in ("Исходная матрица", "Обход")
+
+            view = ScrolledText(
+                frame,
+                wrap="none" if is_matrix_tab else "word",
+                font=("Consolas", 11),
+            )
+
+            if is_matrix_tab:
+                horizontal_scrollbar = ttk.Scrollbar(
+                    frame,
+                    orient="horizontal",
+                    command=view.xview,
+                )
+                view.configure(xscrollcommand=horizontal_scrollbar.set)
+                horizontal_scrollbar.pack(side="bottom", fill="x")
+
             view.pack(fill="both", expand=True)
             view.configure(state="disabled")
             self.views[name] = view
@@ -66,9 +83,18 @@ class App(tk.Tk):
         steps = [[0] * n for _ in range(n)]
         for i, (row, col) in enumerate(recursive_order(n), 1):
             steps[row][col] = i
-        self.show("Обход", "M=N=2. Порядок частей: ВЛ → ВП → НЛ → НП.\n\n"
-                  + "Номера шагов:\n" + matrix_text(steps)
-                  + "\n\nОдномерный массив:\n" + str(r["sequence"]))
+        sequence = r["sequence"]
+        values_per_line = n
+        sequence_text = "\n".join(
+            ", ".join(map(str, sequence[start:start + values_per_line]))
+            for start in range(0, len(sequence), values_per_line)
+        )
+        self.show(
+            "Обход",
+            "M=N=2. Порядок частей: ВЛ → ВП → НЛ → НП.\n\n"
+            + "Номера шагов:\n" + matrix_text(steps)
+            + "\n\nОдномерный массив:\n" + sequence_text,
+        )
         self.show("RLE", "Пары [значение, число повторений]:\n\n" + str(r["rle"]["pairs"]))
         h = r["huffman"]
         frequencies = dict(r["frequencies"])
@@ -80,22 +106,30 @@ class App(tk.Tk):
                   + "\n\nУпакованные байты (HEX):\n" + packed.hex(" ")
                   + "\n\nНулевые биты дополнения в конце байта не входят в длину потока.")
         s = r["statistics"]
-        original = s["source_json_bytes"]
+        original_bits = s["source_payload_bytes"] * 8
+        rle_bits = s["rle_payload_bytes"] * 8
+        huffman_bits = s["huffman_payload_bits"]
         lines = [
-            f"Элементов: {s['elements']}; серий RLE: {s['runs']}",
-            f"Исходная матрица в компактном JSON: {original} байт",
+            "Сравнение полезных данных",
+            "",
+            f"Размер поля значения: {s['value_bytes']} байт.",
+            f"Размер поля счётчика RLE: {s['rle_count_bytes']} байт.",
+            f"Исходный массив: {s['elements']} значений × "
+            f"{s['value_bytes']} байт = {s['source_payload_bytes']} байт ({original_bits} бит).",
+            f"RLE: {s['runs']} пар × ({s['value_bytes']} + {s['rle_count_bytes']}) байт "
+            f"= {s['rle_payload_bytes']} байт ({rle_bits} бит).",
+            f"Хаффман: {huffman_bits} полезных бит, "
+            f"{s['huffman_payload_bytes']} байт после упаковки с дополнением.",
+            "",
         ]
-        for label, key in (("RLE", "rle_json_bytes"), ("Хаффман", "huffman_json_bytes")):
-            size = s[key]
-            lines.append(f"{label}, JSON с метаданными: {size} байт; "
-                         f"K=исходный/сжатый={original / size:.3f}; "
-                         f"экономия={(1 - size / original) * 100:.2f}%")
+        for label, compressed_bits in (("RLE", rle_bits), ("Хаффман", huffman_bits)):
+            ratio = compressed_bits / original_bits
+            lines.append(f"{label}: {ratio:.3f} от исходного размера, "
+                         f"изменение {(ratio - 1) * 100:+.2f}%")
         lines.extend([
-            f"Полезный поток Хаффмана: {s['huffman_payload_bits']} бит, "
-            f"{s['huffman_payload_bytes']} байт с дополнением.",
-            "Размер JSON Хаффмана включает таблицу кодов и Base64.",
-            "Отрицательная экономия означает увеличение объёма.",
-            "Общий сохраняемый файл — отчёт с обоими методами и исходными данными.",
+            "",
+            "Размеры исходного массива и RLE рассчитаны для полей фиксированной ширины.",
+            "Пробелы, переносы строк, таблица кодов и оформление JSON в расчёт не входят.",
         ])
         self.show("Размеры", "\n".join(lines))
 

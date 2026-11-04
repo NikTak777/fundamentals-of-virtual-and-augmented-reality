@@ -107,6 +107,28 @@ def json_size(obj):
                           separators=(",", ":")).encode("utf-8"))
 
 
+def payload_sizes(sequence, rle_pairs):
+    """Размеры данных при записи целых чисел полями фиксированной ширины."""
+    smallest = min(sequence, default=0)
+    largest = max(sequence, default=0)
+    if smallest < 0:
+        # Учитываем разряд знака при записи в дополнительном коде.
+        value_bits = max(largest, ~smallest).bit_length() + 1
+    else:
+        value_bits = largest.bit_length()
+    value_bytes = max(1, (value_bits + 7) // 8)
+
+    longest_run = max((count for _, count in rle_pairs), default=0)
+    count_bytes = max(1, (longest_run.bit_length() + 7) // 8)
+
+    return {
+        "value_bytes": value_bytes,
+        "rle_count_bytes": count_bytes,
+        "source_payload_bytes": len(sequence) * value_bytes,
+        "rle_payload_bytes": len(rle_pairs) * (value_bytes + count_bytes),
+    }
+
+
 def process(matrix):
     """Обходит матрицу, сжимает последовательность и собирает отчёт."""
     size = len(matrix)
@@ -136,9 +158,7 @@ def process(matrix):
         "statistics": {
             "elements": len(sequence),
             "runs": len(rle_pairs),
-            "source_json_bytes": json_size(matrix),
-            "rle_json_bytes": json_size(rle_result),
-            "huffman_json_bytes": json_size(huffman_result),
+            **payload_sizes(sequence, rle_pairs),
             "huffman_payload_bits": huffman_bit_count,
             "huffman_payload_bytes": len(huffman_bytes),
         },
