@@ -1,4 +1,3 @@
-import base64
 import heapq
 import itertools
 import re
@@ -135,10 +134,9 @@ def process(matrix):
         "shape": [size, size],
         "codes": [[value, huffman_codes[value]] for value in sorted(huffman_codes)],
         "bit_length": huffman_bit_count,
-        "data_base64": base64.b64encode(huffman_bytes).decode("ascii"),
+        "packed": huffman_bytes,
     }
     return {
-        "variant": 8,
         "traversal": "recursive_2x2_TL_TR_BL_BR_ceil_split",
         "source": matrix,
         "sequence": sequence,
