@@ -81,12 +81,11 @@ def huffman_encode(data):
     while stack:
         node, prefix = stack.pop()
         if isinstance(node, int):
-            codes[node] = prefix or "0"  # Один уникальный символ.
+            codes[node] = prefix or "0"
         else:
             stack.append((node[1], prefix + "1"))
             stack.append((node[0], prefix + "0"))
 
-    # Биты действительно упаковываются в байты, а не хранятся строкой 0/1.
     packed = bytearray()
     buffer = used = bit_length = 0
     for value in data:
