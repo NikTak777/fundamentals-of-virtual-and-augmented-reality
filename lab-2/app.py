@@ -23,12 +23,12 @@ class App(tk.Tk):
         bar.pack(fill="x")
         ttk.Button(bar, text="Открыть матрицу", command=self.open_file).pack(side="left")
         ttk.Button(bar, text="Сохранить результат", command=self.save).pack(side="left", padx=10)
-        self.status = tk.StringVar(value="Откройте TXT, CSV или JSON с квадратной матрицей.")
+        self.status = tk.StringVar(value="Откройте TXT или CSV с квадратной матрицей.")
         ttk.Label(self, textvariable=self.status, padding=10).pack(fill="x")
         notebook = ttk.Notebook(self)
         notebook.pack(fill="both", expand=True, padx=10, pady=(0, 10))
         self.views = {}
-        for name in ("Исходная матрица", "Обход", "RLE", "Хаффман", "Размеры"):
+        for name in ("Исходная матрица", "Обход", "Метод RLE", "Метод Хаффмана", "Итоговая статистика"):
             frame = ttk.Frame(notebook)
             notebook.add(frame, text=name)
 
@@ -64,7 +64,7 @@ class App(tk.Tk):
 
     def open_file(self):
         path = filedialog.askopenfilename(filetypes=[
-            ("Матрицы", "*.txt *.csv *.json"), ("Все файлы", "*.*")])
+            ("Матрицы", "*.txt *.csv"), ("Все файлы", "*.*")])
         if not path:
             return
         try:
@@ -72,9 +72,12 @@ class App(tk.Tk):
             self.result = result
             self.display()
             n = len(result["source"])
-            self.status.set(f"{Path(path).name} | {n} × {n}")
+            self.status.set(f"Файл: {Path(path).name} | Размер: {n} x {n}")
         except (OSError, ValueError) as exc:
-            messagebox.showerror("Ошибка", str(exc))
+            messagebox.showerror(
+                title="Ошибка открытия файла",
+                message="Неверный формат файла: " + str(exc)
+            )
 
     def display(self):
         r = self.result
@@ -90,48 +93,51 @@ class App(tk.Tk):
             for start in range(0, len(sequence), values_per_line)
         )
         self.show(
-            "Обход",
-            "M=N=2. Порядок частей: ВЛ → ВП → НЛ → НП.\n\n"
-            + "Номера шагов:\n" + matrix_text(steps)
-            + "\n\nОдномерный массив:\n" + sequence_text,
+            name="Обход",
+            text=(
+                "Параметры обхода: M=N=2.\n\n"
+                + "Номера шагов:\n" + matrix_text(steps)
+                + "\n\nОдномерный массив:\n" + sequence_text
+            )
         )
-        self.show("RLE", "Пары [значение, число повторений]:\n\n" + str(r["rle"]["pairs"]))
+        self.show("Метод RLE", "Пары [значение, число повторений]:\n\n" + str(r["rle"]["pairs"]))
         h = r["huffman"]
         frequencies = dict(r["frequencies"])
         table = "Значение\tЧастота\tКод\n" + "\n".join(
             f"{value}\t{frequencies[value]}\t{code}" for value, code in h["codes"])
         packed = base64.b64decode(h["data_base64"])
         bits = "".join(f"{byte:08b}" for byte in packed)[:h["bit_length"]]
-        self.show("Хаффман", table + "\n\nБитовый поток:\n" + bits
+        grouped_bits = " ".join(
+            bits[start:start + 8]
+            for start in range(0, len(bits), 8)
+        )
+        self.show(
+            name="Метод Хаффмана",
+            text = table + "\n\nБитовый поток:\n" + grouped_bits
                   + "\n\nУпакованные байты (HEX):\n" + packed.hex(" ")
-                  + "\n\nНулевые биты дополнения в конце байта не входят в длину потока.")
+        )
         s = r["statistics"]
         original_bits = s["source_payload_bytes"] * 8
         rle_bits = s["rle_payload_bytes"] * 8
         huffman_bits = s["huffman_payload_bits"]
         lines = [
-            "Сравнение полезных данных",
-            "",
+            f"Итоговая статистика:\n",
             f"Размер поля значения: {s['value_bytes']} байт.",
-            f"Размер поля счётчика RLE: {s['rle_count_bytes']} байт.",
+            f"Размер поля счётчика: {s['rle_count_bytes']} байт.",
             f"Исходный массив: {s['elements']} значений × "
-            f"{s['value_bytes']} байт = {s['source_payload_bytes']} байт ({original_bits} бит).",
+            f"{s['value_bytes']} байт = {s['source_payload_bytes']} байт ({original_bits} бит).\n",
+            f"Результаты метода RLE:",
             f"RLE: {s['runs']} пар × ({s['value_bytes']} + {s['rle_count_bytes']}) байт "
-            f"= {s['rle_payload_bytes']} байт ({rle_bits} бит).",
-            f"Хаффман: {huffman_bits} полезных бит, "
-            f"{s['huffman_payload_bytes']} байт после упаковки с дополнением.",
+            f"= {s['rle_payload_bytes']} байт ({rle_bits} бит).\n",
+            f"Результаты метода Хаффмана:",
+            f"Полезных бит: {huffman_bits}, байт после упаковки: {s['huffman_payload_bytes']} ({s['huffman_payload_bytes'] * 8} бит)",
             "",
         ]
-        for label, compressed_bits in (("RLE", rle_bits), ("Хаффман", huffman_bits)):
+        for label, compressed_bits in (("Метод RLE", rle_bits), ("Метод Хаффмана", huffman_bits)):
             ratio = compressed_bits / original_bits
             lines.append(f"{label}: {ratio:.3f} от исходного размера, "
                          f"изменение {(ratio - 1) * 100:+.2f}%")
-        lines.extend([
-            "",
-            "Размеры исходного массива и RLE рассчитаны для полей фиксированной ширины.",
-            "Пробелы, переносы строк, таблица кодов и оформление JSON в расчёт не входят.",
-        ])
-        self.show("Размеры", "\n".join(lines))
+        self.show("Итоговая статистика", "\n".join(lines))
 
     def save(self):
         if self.result is None:

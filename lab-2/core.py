@@ -1,7 +1,6 @@
 import base64
 import heapq
 import itertools
-import json
 import re
 from collections import Counter
 from pathlib import Path
@@ -22,9 +21,6 @@ def read_matrix(path: str) -> list[list[int]]:
     n = len(matrix)
     if any(len(row) != n for row in matrix):
         raise ValueError("Нужна квадратная матрица: N строк по N чисел.")
-    if any(type(x) is not int for row in matrix for x in row):
-        raise ValueError("Элементы должны быть целыми числами.")
-
     return matrix
 
 
@@ -99,12 +95,6 @@ def huffman_encode(data):
     if used:
         packed.append(buffer << (8 - used))
     return codes, bytes(packed), bit_length, frequencies
-
-
-def json_size(obj):
-    """Размер компактного представления JSON в байтах UTF-8."""
-    return len(json.dumps(obj, ensure_ascii=False,
-                          separators=(",", ":")).encode("utf-8"))
 
 
 def payload_sizes(sequence, rle_pairs):
