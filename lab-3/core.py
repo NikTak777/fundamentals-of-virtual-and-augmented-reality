@@ -17,7 +17,6 @@ def arithmetic_encode(text):
         width = high - low
         low, high = low + width * left, low + width * right
 
-    # Ищем двоичную дробь, принадлежащую полуинтервалу [low, high).
     width = high - low
     size = max(1, width.denominator.bit_length() - width.numerator.bit_length())
     while True:

@@ -22,7 +22,7 @@ DEFAULT_BWT = "ЧАСВУКНЩОПВПААОРЛР"
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Кодирование текста")
+        self.title("Приложение для кодирования текста")
         self.geometry("1050x760")
         self.minsize(760, 560)
         notebook = ttk.Notebook(self)
