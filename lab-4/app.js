@@ -2,7 +2,10 @@
 if (window.AFRAME && window.ARjs) {
   // 1. Компонент строит колесо из цилиндров и 12 прямоугольных зубьев.
   AFRAME.registerComponent('gear', {
-    schema: { color: { default: '#f5b544' } },
+    schema: {
+      color: { default: '#f5b544' },
+      speed: { default: 30 } // Скорость в градусах в секунду; знак задаёт направление.
+    },
     init: function () {
       const addPart = (tag, attributes) => {
         const part = document.createElement(tag);
@@ -28,6 +31,14 @@ if (window.AFRAME && window.ARjs) {
         width: 0.12, height: 0.012, depth: 0.025,
         position: '0.16 0.056 0', color: '#ffffff'
       });
+    },
+    // A-Frame вызывает tick перед отрисовкой каждого кадра сцены.
+    tick: function (time, timeDelta) {
+      if (!running || !markerVisible || failed) return;
+      const seconds = Math.min(timeDelta / 1000, 0.05);
+      this.el.object3D.rotation.y += this.data.speed * Math.PI / 180 * seconds;
+      // Обновляем матрицу объекта сразу, чтобы новый угол попал в текущий кадр.
+      this.el.object3D.updateMatrix();
     }
   });
 }
@@ -66,8 +77,6 @@ if (!window.AFRAME || !window.ARjs) {
 } else {
   const scene = document.querySelector('#scene-template').content.cloneNode(true);
   const marker = scene.querySelector('#marker');
-  const leftGear = scene.querySelector('#left-gear');
-  const rightGear = scene.querySelector('#right-gear');
 
   window.addEventListener('camera-init', updateControls);
   window.addEventListener('camera-error', () => {
@@ -87,19 +96,4 @@ if (!window.AFRAME || !window.ARjs) {
   });
   document.body.appendChild(scene);
 
-  // 4. На каждом кадре изменяем углы на одинаковые величины разных знаков.
-  let previousTime = null;
-  function animate(time) {
-    // Время кадра переводим из миллисекунд в секунды. Ограничение убирает
-    // резкий скачок угла после возвращения на вкладку браузера.
-    const seconds = previousTime === null ? 0 : Math.min((time - previousTime) / 1000, 0.05);
-    previousTime = time;
-    if (running && markerVisible && !failed) {
-      const step = seconds * Math.PI / 6; // 30 градусов в секунду.
-      leftGear.object3D.rotation.y += step;
-      rightGear.object3D.rotation.y -= step;
-    }
-    requestAnimationFrame(animate);
-  }
-  requestAnimationFrame(animate);
 }

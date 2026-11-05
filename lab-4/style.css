@@ -1,13 +1,15 @@
 /* Интерфейс расположен поверх прозрачной 3D-сцены и изображения камеры. */
 * { box-sizing: border-box; }
 html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
+/* Ограничиваем область страницы экраном: AR.js может растягивать body под видео. */
+html { position: fixed; inset: 0; }
 body { font: 15px/1.45 Arial, sans-serif; color: #f4f7fb; background: #162335; }
-a-scene { width: 100%; height: 100%; z-index: 1; }
+a-scene { width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 /* AR.js одинаково масштабирует видео и сцену; лишнее обрезается краем окна. */
 video { z-index: 0 !important; }
 .panel {
   position: fixed;
-  z-index: 2;
+  z-index: 10;
   left: 16px;
   width: min(440px, calc(100% - 32px));
   padding: 16px 20px;
