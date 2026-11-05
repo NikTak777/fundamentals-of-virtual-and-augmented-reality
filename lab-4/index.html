@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#162335">
+  <link rel="icon" href="data:,">
+  <title>ЛР4 — Учебный AR-стенд</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Готовые библиотеки: A-Frame рисует сцену, AR.js распознаёт маркер. -->
+  <script src="vendor/aframe.min.js"></script>
+  <script src="vendor/aframe-ar.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="panel heading">
+    <p class="eyebrow">Лабораторная работа №4 · Дополненная реальность</p>
+    <h1>Зубчатая передача</h1>
+    <p>Наведите камеру на маркер Hiro, затем нажмите «Пуск».</p>
+    <a href="marker.html" target="_blank" rel="noopener">Открыть маркер для печати ↗</a>
+  </header>
+
+  <footer class="panel controls">
+    <p id="status" role="status" aria-live="polite">Подготовка камеры…</p>
+    <button id="toggle" type="button" disabled>Пуск</button>
+    <p class="explanation">Два одинаковых колеса вращаются с одинаковой скоростью
+      в противоположных направлениях. Передаточное отношение — 1:1.</p>
+  </footer>
+  <noscript>Для работы стенда включите JavaScript в браузере.</noscript>
+
+  <!-- Шаблон вставляется из app.js после проверки доступа к камере. -->
+  <template id="scene-template">
+    <a-scene embedded xr-mode-ui="enabled: false" loading-screen="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      renderer="antialias: true; alpha: true"
+      arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono;
+        cameraParametersUrl: assets/camera_para.dat">
+      <!-- Локальный шаблон Hiro, соответствующий картинке assets/hiro.png. -->
+      <a-marker id="marker" type="pattern" url="assets/patt.hiro"
+        emitevents="true">
+        <!-- Всё внутри a-marker привязано к его положению в кадре. -->
+        <a-box position="0 0.025 0" width="1.42" height="0.05" depth="0.88"
+          color="#24354b"></a-box>
+        <a-entity id="left-gear" position="-0.3 0.15 0" gear="color: #f5b544"></a-entity>
+        <a-entity id="right-gear" position="0.3 0.15 0" rotation="0 15 0"
+          gear="color: #53c6df"></a-entity>
+      </a-marker>
+      <a-entity light="type: ambient; intensity: 1.2"></a-entity>
+      <a-entity light="type: directional; intensity: 1" position="1 3 2"></a-entity>
+      <a-entity camera look-controls="enabled: false" wasd-controls="enabled: false"></a-entity>
+    </a-scene>
+  </template>
+</body>
+</html>
