@@ -1,12 +1,36 @@
-/* Интерфейс расположен поверх прозрачной 3D-сцены и изображения камеры. */
-* { box-sizing: border-box; }
-html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; }
-/* Ограничиваем область страницы экраном: AR.js может растягивать body под видео. */
-html { position: fixed; inset: 0; }
-body { font: 15px/1.45 Arial, sans-serif; color: #f4f7fb; background: #162335; }
-a-scene { width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-/* AR.js одинаково масштабирует видео и сцену; лишнее обрезается краем окна. */
-video { z-index: 0 !important; }
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+html {
+  position: fixed;
+  inset: 0;
+
+}
+body {
+  font: 15px/1.45 Arial, sans-serif;
+  color: #f4f7fb;
+  background: #162335;
+}
+
+a-scene {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+video {
+  z-index: 0 !important;
+}
+
 .panel {
   position: fixed;
   z-index: 10;
@@ -18,14 +42,45 @@ video { z-index: 0 !important; }
   background: #162335ed;
   box-shadow: 0 8px 32px #00000026;
 }
-.heading { top: max(16px, env(safe-area-inset-top)); }
-.controls { bottom: max(16px, env(safe-area-inset-bottom)); }
-.eyebrow { margin: 0 0 5px; color: #b0c4d9; font-size: 11px; }
-h1 { margin: 0; font-size: 25px; line-height: 1.2; }
-p { margin: 9px 0; }
-a { color: #85d7ed; text-underline-offset: 3px; }
-#status { margin-top: 0; font-weight: bold; }
-#status[data-error] { color: #ffb8ae; }
+
+.heading {
+  top: max(16px, env(safe-area-inset-top));
+}
+
+.controls {
+  bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+.eyebrow {
+  margin: 0 0 5px;
+  color: #b0c4d9;
+  font-size: 11px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 25px;
+  line-height: 1.2;
+}
+
+p {
+  margin: 9px 0;
+}
+
+a {
+  color: #85d7ed;
+  text-underline-offset: 3px;
+}
+
+#status {
+  margin-top: 0;
+  font-weight: bold;
+}
+
+#status[data-error] {
+  color: #ffb8ae;
+}
+
 button {
   width: 100%;
   min-height: 44px;
@@ -36,16 +91,46 @@ button {
   font: bold 16px Arial, sans-serif;
   cursor: pointer;
 }
-button:disabled { background: #40516a; color: #c4cfdd; cursor: default; }
-button:focus-visible, a:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
-.explanation { margin-bottom: 0; color: #c5d4e2; font-size: 12px; }
-noscript { position: fixed; top: 45%; left: 16px; z-index: 3; }
+
+button:disabled {
+  background: #40516a;
+  color: #c4cfdd;
+  cursor: default;
+}
+
+button:focus-visible, a:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 4px;
+}
+
+.explanation {
+  margin-bottom: 0;
+  color: #c5d4e2;
+  font-size: 12px;
+}
+
+noscript {
+  position: fixed;
+  top: 45%;
+  left: 16px;
+  z-index: 3;
+}
+
 @media (max-width: 600px) {
   .panel { padding: 12px 16px; }
   h1 { font-size: 22px; }
 }
+
 @media (max-height: 500px) {
-  .heading { width: 40%; }
-  .controls { left: auto; right: 16px; width: 40%; }
-  .eyebrow, .heading > p:not(.eyebrow), .explanation { display: none; }
+  .heading {
+    width: 40%;
+  }
+  .controls {
+    left: auto;
+    right: 16px;
+    width: 40%;
+  }
+  .eyebrow, .heading > p:not(.eyebrow), .explanation {
+    display: none;
+  }
 }
