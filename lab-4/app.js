@@ -25,11 +25,11 @@ if (window.AFRAME && window.ARjs) {
           rotation: `0 ${-i * 30} 0`
         });
       }
-      addPart('a-cylinder', { radius: 0.065, height: 0.18, color: '#e8edf4' });
+      addPart('a-cylinder', { radius: 0.065, height: 0.18, color: '#cccccc' });
       // Светлая отметка на поверхности помогает заметить вращение колеса.
       addPart('a-box', {
         width: 0.12, height: 0.012, depth: 0.025,
-        position: '0.16 0.056 0', color: '#ffffff'
+        position: '0.16 0.066 0', color: '#cccccc'
       });
     },
     // A-Frame вызывает tick перед отрисовкой каждого кадра сцены.
