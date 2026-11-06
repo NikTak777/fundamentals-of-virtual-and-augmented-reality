@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#162335">
   <link rel="icon" href="data:,">
   <title>ЛР4 — Учебный AR-стенд</title>
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="css/index.css">
   <!-- Готовые библиотеки: A-Frame рисует сцену, AR.js распознаёт маркер. -->
   <script src="vendor/aframe.min.js"></script>
   <script src="vendor/aframe-ar.js"></script>
@@ -14,7 +14,6 @@
 </head>
 <body>
   <header class="panel heading">
-    <p class="eyebrow">Лабораторная работа №4 · Дополненная реальность</p>
     <h1>Зубчатая передача</h1>
     <p>Наведите камеру на маркер Hiro, затем нажмите «Пуск».</p>
     <a href="marker.html" target="_blank" rel="noopener">Открыть маркер для печати ↗</a>
@@ -23,8 +22,6 @@
   <footer class="panel controls">
     <p id="status" role="status" aria-live="polite">Подготовка камеры…</p>
     <button id="toggle" type="button" disabled>Пуск</button>
-    <p class="explanation">Два одинаковых колеса вращаются с одинаковой скоростью
-      в противоположных направлениях. Передаточное отношение — 1:1.</p>
   </footer>
   <noscript>Для работы стенда включите JavaScript в браузере.</noscript>
 

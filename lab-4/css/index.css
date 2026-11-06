@@ -12,8 +12,8 @@ html, body {
 html {
   position: fixed;
   inset: 0;
-
 }
+
 body {
   font: 15px/1.45 Arial, sans-serif;
   color: #f4f7fb;
@@ -51,19 +51,13 @@ video {
   bottom: max(16px, env(safe-area-inset-bottom));
 }
 
-.eyebrow {
-  margin: 0 0 5px;
-  color: #b0c4d9;
-  font-size: 11px;
-}
-
 h1 {
   margin: 0;
   font-size: 25px;
   line-height: 1.2;
 }
 
-p {
+.heading p {
   margin: 9px 0;
 }
 
@@ -73,7 +67,7 @@ a {
 }
 
 #status {
-  margin-top: 0;
+  margin: 0 0 9px;
   font-weight: bold;
 }
 
@@ -103,12 +97,6 @@ button:focus-visible, a:focus-visible {
   outline-offset: 4px;
 }
 
-.explanation {
-  margin-bottom: 0;
-  color: #c5d4e2;
-  font-size: 12px;
-}
-
 noscript {
   position: fixed;
   top: 45%;
@@ -122,15 +110,14 @@ noscript {
 }
 
 @media (max-height: 500px) {
-  .heading {
+  .heading, .controls {
     width: 40%;
   }
   .controls {
     left: auto;
     right: 16px;
-    width: 40%;
   }
-  .eyebrow, .heading > p:not(.eyebrow), .explanation {
+  .heading p {
     display: none;
   }
 }
