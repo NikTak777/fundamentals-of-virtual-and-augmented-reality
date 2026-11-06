@@ -1,0 +1,35 @@
+body {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 1fr auto 1fr;
+  justify-items: center;
+  gap: 16px;
+  min-height: 100svh;
+  margin: 0;
+  padding: 16px;
+  text-align: center;
+  color: #172336;
+  background: #fff;
+  font: 16px/1.5 Arial, sans-serif;
+}
+
+header { align-self: end; max-width: 42rem; }
+h1 { margin: 0; font-size: 24px; }
+p { margin: 8px 0 0; }
+img { width: min(78vw, 60svh); height: auto; }
+.actions { align-self: start; }
+button, a { margin: 8px; font: inherit; }
+
+@media screen and (max-width: 360px), screen and (max-height: 560px) {
+  body { grid-template-rows: auto auto auto; align-content: center; gap: 12px; }
+  img { width: min(78vw, 47svh); }
+}
+
+@page { size: A4 portrait; margin: 20mm; }
+
+@media print {
+  body { display: block; min-height: 0; padding: 0; }
+  header { margin: 0 auto; }
+  img { display: block; width: 120mm; margin: 24px auto; }
+  .actions { display: none; }
+}
